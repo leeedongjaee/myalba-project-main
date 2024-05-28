@@ -1,11 +1,7 @@
 package hello.hellospring.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.Hibernate;
-
-import java.util.List;
+import java.util.Base64;
 
 @Entity
 public class Member {
@@ -19,6 +15,14 @@ public class Member {
     private String nickname;
     private String password1;
     private String password2;
+    @Enumerated(EnumType.STRING)
+    private EmploymentType employmentType;
+
+    public Member() {}
+
+    public Member(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;
@@ -57,7 +61,7 @@ public class Member {
     }
 
     public void setPassword1(String password1) {
-        this.password1 = password1;
+        this.password1 = Base64.getEncoder().encodeToString(password1.getBytes());
     }
 
     public String getPassword2() {
@@ -65,7 +69,7 @@ public class Member {
     }
 
     public void setPassword2(String password2) {
-        this.password2 = password2;
+        this.password2 = Base64.getEncoder().encodeToString(password2.getBytes());
     }
 
     public EmploymentType getEmploymentType() {
@@ -75,16 +79,6 @@ public class Member {
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
     }
-
-    @Enumerated(EnumType.STRING)
-    private EmploymentType employmentType;
-    public Member() {
-    }
-
-    public Member(Long id) {
-        this.id = id;
-    }
-    // Getter, Setter 추가
 
     @Override
     public boolean equals(Object o) {
@@ -97,6 +91,4 @@ public class Member {
     public int hashCode() {
         return getClass().hashCode();
     }
-
-
 }

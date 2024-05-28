@@ -33,6 +33,7 @@ public class ReviewService {
         Member author = memberRepository.findById(authorId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid author ID"));
 
+
         Review review = new Review();
         review.setBrand(brand);
         review.setAuthor(author);

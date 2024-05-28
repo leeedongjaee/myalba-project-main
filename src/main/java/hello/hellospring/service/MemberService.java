@@ -5,6 +5,7 @@ import hello.hellospring.repository.MemberRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 @Transactional
@@ -37,11 +38,12 @@ public class MemberService {
         return memberRepository.findById(memberId);
     }
     public Optional<Member> login(String email, String password) {
-        Optional<Member> findMember = memberRepository.findByEmail(email);
-        if (findMember.isPresent()) {
-            Member member = findMember.get();
-            if (member.getPassword1().equals(password)) {
-                return findMember;
+        Optional<Member> member = memberRepository.findByEmail(email);
+        if (member.isPresent()) {
+            Member foundMember = member.get();
+            String decodedPassword = new String(Base64.getDecoder().decode(foundMember.getPassword1()));
+            if (decodedPassword.equals(password)) {
+                return member;
             }
         }
         return Optional.empty();

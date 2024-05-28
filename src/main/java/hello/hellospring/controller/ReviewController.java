@@ -1,5 +1,6 @@
 package hello.hellospring.controller;
 
+import hello.hellospring.domain.EmploymentType;
 import hello.hellospring.domain.Member;
 import hello.hellospring.domain.Review;
 import hello.hellospring.service.BrandService;
@@ -23,17 +24,23 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@PathVariable("name") String name, @RequestBody ReviewForm form, HttpSession session) {
+    public ResponseEntity<String> createReview(@PathVariable("name") String name, @RequestBody ReviewForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-
+        if (loggedInMember.getEmploymentType() != EmploymentType.EMPLOYEE) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("아르바이트생 회원만 작성 가능합니다.");
+        }
         Long brandId = brandService.findBrandIdByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid brand name"));
 
-        Review review = reviewService.saveReview(brandId, loggedInMember.getId(), form.getContent(), form.getRating());
-        return ResponseEntity.ok(review);
+        try {
+            Review review = reviewService.saveReview(brandId, loggedInMember.getId(), form.getContent(), form.getRating());
+            return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping
