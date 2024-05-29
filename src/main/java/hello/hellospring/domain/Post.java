@@ -3,6 +3,7 @@ package hello.hellospring.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,15 @@ public class Post {
     private EmploymentType employmentType;
 
     private int likeCount;  // 추가: 좋아요 수
-    private int viewCount;  // 조회수 추가
+    private int viewCount;  // 조회수 추가@ElementCollection
+
+    @ElementCollection
+    @CollectionTable(name = "post_image_urls", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "image_url", length = 1024)
+    private List<String> imageUrls = new ArrayList<>();
+
+
+
 
 
     @ManyToMany
@@ -158,6 +167,15 @@ public class Post {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

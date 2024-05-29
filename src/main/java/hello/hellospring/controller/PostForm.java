@@ -2,8 +2,10 @@ package hello.hellospring.controller;
 
 
 import hello.hellospring.domain.EmploymentType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.ConstructorProperties;
+import java.util.List;
 
 public class PostForm {
     private String title;
@@ -11,6 +13,16 @@ public class PostForm {
     private String brandName; // 브랜드 이름을 담을 변수
     private Long brandId; // 브랜드 아이디를 담을 변수
     private int viewCount; // 조회수 추가
+
+    public List<MultipartFile> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MultipartFile> images) {
+        this.images = images;
+    }
+
+    private List<MultipartFile> images;
 
     // 생성자, 게터, 세터
     @ConstructorProperties({"title", "content", "brandName", "brandId", "viewCount"})

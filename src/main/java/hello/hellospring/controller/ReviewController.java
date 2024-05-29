@@ -27,7 +27,7 @@ public class ReviewController {
     public ResponseEntity<String> createReview(@PathVariable("name") String name, @RequestBody ReviewForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인시 사용 가능합니다.");
         }
         if (loggedInMember.getEmploymentType() != EmploymentType.EMPLOYEE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("아르바이트생 회원만 작성 가능합니다.");
