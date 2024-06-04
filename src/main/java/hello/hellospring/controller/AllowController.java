@@ -1,8 +1,10 @@
 package hello.hellospring.controller;
 
 import hello.hellospring.domain.Allow;
+import hello.hellospring.domain.Brand;
 import hello.hellospring.domain.Member;
 import hello.hellospring.service.AllowService;
+import hello.hellospring.service.BrandService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +22,13 @@ import java.util.Optional;
 public class AllowController {
 
     private final AllowService allowService;
+    private final BrandService brandService;
+
 
     @Autowired
-    public AllowController(AllowService allowService) {
+    public AllowController(AllowService allowService,BrandService brandService) {
         this.allowService = allowService;
+        this.brandService=brandService;
     }
 
     @PostMapping("/new")
@@ -37,11 +42,16 @@ public class AllowController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
+        Optional<Brand> brandOptional = brandService.findById(brandId);
+        if (!brandOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 브랜드 ID입니다.");
+        }
+
         Allow allow = new Allow();
         allow.setTitle(title);
         allow.setContent(content);
-        allow.setBrandId(brandId);
-        allow.setMemberId(loggedInMember.getId());
+        allow.setBrand(brandOptional.get());
+        allow.setMember(loggedInMember);
 
         try {
             allowService.createAllow(allow, images);
@@ -88,12 +98,12 @@ public class AllowController {
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
         }
-        Long memberId = request.get("memberId");
-        Long brandId = request.get("brandId");
+        Long allowId = request.get("allowId");
 
-        allowService.approveAllow(memberId, brandId);
+        allowService.approveAllow(allowId);
         return ResponseEntity.ok("회원이 인증되었습니다.");
     }
+
     @PostMapping("/reject")
     public ResponseEntity<?> rejectAllow(@RequestBody Map<String, Long> request, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");

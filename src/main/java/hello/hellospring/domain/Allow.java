@@ -11,15 +11,18 @@ public class Allow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Long memberId;
-    private Long brandId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
     private String title;
     private String content;
 
     @ElementCollection
     @CollectionTable(name = "allow_images", joinColumns = @JoinColumn(name = "allow_id"))
-    @Column(name = "image_url")
+    @Column(name = "image_url",length = 1024)
     private List<String> imageUrls;
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -33,20 +36,20 @@ public class Allow {
         this.id = id;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public Long getBrandId() {
-        return brandId;
+    public Brand getBrand() {
+        return brand;
     }
 
-    public void setBrandId(Long brandId) {
-        this.brandId = brandId;
+    public void setBrand(Brand brandId) {
+        this.brand = brand;
     }
 
     public String getTitle() {

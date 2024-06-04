@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface BrandRepository extends JpaRepository<Brand, Long> {
     Optional<Brand> findByName(String name);
     Optional<Brand> findBrandById(Long brandId);
+    Optional<Brand> findById(Long id);
     @Query("SELECT b FROM Brand b ORDER BY b.averageRating DESC")
     List<Brand> findAllOrderByAverageRatingDesc();
 }

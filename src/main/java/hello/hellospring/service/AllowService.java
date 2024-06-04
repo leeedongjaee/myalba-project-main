@@ -4,6 +4,8 @@ import hello.hellospring.domain.Allow;
 import hello.hellospring.domain.AllowVerifiedMember;
 import hello.hellospring.repository.AllowRepository;
 import hello.hellospring.repository.AllowVerifiedMemberRepository;
+import hello.hellospring.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +25,16 @@ public class AllowService {
 
     private final AllowRepository allowRepository;
     private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
+    private final MemberRepository memberRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public AllowService(AllowRepository allowRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository) {
+    @Autowired
+    public AllowService(AllowRepository allowRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository, MemberRepository memberRepository) {
         this.allowRepository = allowRepository;
         this.allowVerifiedMemberRepository = allowVerifiedMemberRepository;
+        this.memberRepository = memberRepository;
     }
 
     public void createAllow(Allow allow, List<MultipartFile> images) throws IOException {
@@ -52,11 +57,12 @@ public class AllowService {
         allowRepository.deleteById(id);
     }
 
-    public void approveAllow(Long memberId, Long brandId) {
-        AllowVerifiedMember allowVerifiedMember = new AllowVerifiedMember();
-        allowVerifiedMember.setMemberId(memberId);
-        allowVerifiedMember.setBrandId(brandId);
-        allowVerifiedMemberRepository.save(allowVerifiedMember);
+    public void approveAllow(Long allowId) {
+        Allow allow = allowRepository.findById(allowId).orElseThrow(() -> new IllegalArgumentException("Invalid allow ID"));
+        AllowVerifiedMember verifiedMember = new AllowVerifiedMember();
+        verifiedMember.setMember(allow.getMember());
+        verifiedMember.setBrand(allow.getBrand());
+        allowVerifiedMemberRepository.save(verifiedMember);
     }
 
     private List<String> saveImages(List<MultipartFile> images) throws IOException {

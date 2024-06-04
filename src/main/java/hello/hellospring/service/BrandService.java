@@ -32,4 +32,7 @@ public class BrandService {
     public List<Brand> getBrandsOrderByAverageRating() {
         return brandRepository.findAllOrderByAverageRatingDesc();
     }
+    public Optional<Brand> findById(Long id) {
+        return brandRepository.findById(id);
+    }
 }
