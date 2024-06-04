@@ -130,4 +130,7 @@ public class PostService {
             }
         });
     }
+    public List<Post> findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType employmentType) {
+        return postRepository.findPostsByEmploymentTypeOrderByLikesDesc(employmentType);
+    }
 }

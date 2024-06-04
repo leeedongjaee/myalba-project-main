@@ -4,6 +4,7 @@ import hello.hellospring.domain.EmploymentType;
 import hello.hellospring.domain.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -18,6 +19,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthorId(Long authorId);
 
     List<Post> findByEmploymentTypeIsNull();
+    @Query("SELECT p FROM Post p WHERE p.employmentType = :employmentType ORDER BY p.likes DESC")
+    List<Post> findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType employmentType);
+
+
 }
+
 
 

@@ -267,4 +267,14 @@ public class PostController {
         likeService.likePost(postId, loggedInMember);
         return ResponseEntity.ok("Liked");
     }
+    @GetMapping("/posts/hot/employee")
+    public ResponseEntity<List<Post>> listPostsByLikeAndEmployee() {
+        List<Post> posts = postService.findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType.EMPLOYEE);
+        return ResponseEntity.ok(posts);
+    }
+    @GetMapping("/posts/hot/boss")
+    public ResponseEntity<List<Post>> listPostsByLikeAndBoss() {
+        List<Post> posts = postService.findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType.BOSS);
+        return ResponseEntity.ok(posts);
+    }
 }
