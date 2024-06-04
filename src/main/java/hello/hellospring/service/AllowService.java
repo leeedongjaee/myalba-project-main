@@ -72,4 +72,7 @@ public class AllowService {
     public void rejectAllow(Long allowId) {
         allowRepository.deleteById(allowId);
     }
+    public boolean isVerifiedMember(Long memberId, Long brandId) {
+        return allowVerifiedMemberRepository.existsByMemberIdAndBrandId(memberId, brandId);
+    }
 }
