@@ -43,6 +43,7 @@ public class ReviewService {
         review.setAuthor(member);
         review.setContent(content);
         review.setRating(rating);
+        review.setCreatedAt(LocalDateTime.now());
         updateBrandAverageRating(brandId);
         return reviewRepository.save(review);
     }
