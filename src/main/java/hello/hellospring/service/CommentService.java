@@ -57,12 +57,14 @@ public class CommentService {
 
     public void updateComment(Long postId, Long commentId, Long authorId, String content) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID"));
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재 하지 않습니다."));
 
         if (!comment.getPost().getId().equals(postId)) {
             throw new IllegalArgumentException("Comment does not belong to the post");
         }
-
+        if (comment.isDeleted()) {
+            throw new IllegalArgumentException("삭제된 댓글은 수정할 수 없습니다.");
+        }
         if (!comment.getAuthor().getId().equals(authorId)) {
             throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
