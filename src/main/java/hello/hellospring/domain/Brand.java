@@ -18,6 +18,8 @@ public class Brand {
     @JsonIgnore
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Post> posts;
+    @OneToMany(mappedBy = "brand")
+    private List<Review> reviews;
 
     private double averageRating; // 평균 평점 필드 추가
 
@@ -52,5 +54,13 @@ public class Brand {
 
     public void setAverageRating(double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

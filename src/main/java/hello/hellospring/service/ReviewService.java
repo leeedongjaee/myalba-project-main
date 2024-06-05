@@ -3,6 +3,7 @@ package hello.hellospring.service;
 import hello.hellospring.domain.Brand;
 import hello.hellospring.domain.Member;
 import hello.hellospring.domain.Review;
+import hello.hellospring.repository.AllowVerifiedMemberRepository;
 import hello.hellospring.repository.BrandRepository;
 import hello.hellospring.repository.MemberRepository;
 import hello.hellospring.repository.ReviewRepository;
@@ -20,48 +21,41 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BrandRepository brandRepository;
     private final MemberRepository memberRepository;
+    private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, BrandRepository brandRepository, MemberRepository memberRepository) {
+    public ReviewService(ReviewRepository reviewRepository, BrandRepository brandRepository, MemberRepository memberRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository) {
         this.reviewRepository = reviewRepository;
         this.brandRepository = brandRepository;
         this.memberRepository = memberRepository;
+        this.allowVerifiedMemberRepository=allowVerifiedMemberRepository;
     }
 
-    public Review saveReview(Long brandId, Long authorId, String content, double rating) {
-        Brand brand = brandRepository.findById(brandId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid brand ID"));
-        Member author = memberRepository.findById(authorId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid author ID"));
+    public Review saveReview(Long brandId, Long memberId, String content, double rating) {
+        if (!allowVerifiedMemberRepository.existsByMemberIdAndBrandId(memberId, brandId)) {
+            throw new IllegalArgumentException("인증된 사용자만 리뷰를 작성할 수 있습니다.");
+        }
 
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+        Brand brand = brandRepository.findById(brandId).orElseThrow(() -> new IllegalArgumentException("Invalid brand ID"));
 
         Review review = new Review();
         review.setBrand(brand);
-        review.setAuthor(author);
+        review.setAuthor(member);
         review.setContent(content);
         review.setRating(rating);
-        review.setCreatedAt(LocalDateTime.now());
-
-        Review savedReview = reviewRepository.save(review);
-
-        // 브랜드의 평균 평점 업데이트
-        updateBrandRating(brand);
-
-        return savedReview;
+        updateBrandAverageRating(brandId);
+        return reviewRepository.save(review);
     }
 
-    private void updateBrandRating(Brand brand) {
-        List<Review> reviews = reviewRepository.findByBrandId(brand.getId());
-        double averageRating = reviews.stream()
-                .mapToDouble(Review::getRating)
-                .average()
-                .orElse(0.0);
+    @Transactional
+    public void updateBrandAverageRating(Long brandId) {
+        List<Review> reviews = reviewRepository.findByBrandId(brandId);
+        double averageRating = reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0);
 
-        // 평균 평점을 소수점 이하 한 자리로 반올림
-        BigDecimal roundedRating = BigDecimal.valueOf(averageRating)
-                .setScale(1, RoundingMode.HALF_UP);
-        brand.setAverageRating(roundedRating.doubleValue());
-
-        brandRepository.save(brand);
+        Brand brand = brandRepository.findById(brandId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid brand ID"));
+        brand.setAverageRating(averageRating);
+        brandRepository.save(brand); // 업데이트된 평점 저장
     }
 
     public List<Review> findReviewsByBrandId(Long brandId) {

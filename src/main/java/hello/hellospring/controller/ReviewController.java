@@ -42,7 +42,6 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
     @GetMapping
     public ResponseEntity<List<Review>> listReviewsByBrand(@PathVariable("name") String name) {
         Long brandId = brandService.findBrandIdByName(name)

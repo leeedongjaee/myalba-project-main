@@ -20,6 +20,7 @@ public class Review {
     private Member author;
 
     private String content;
+    @Column(nullable = false)
     private double rating;
 
     @Column(columnDefinition = "TIMESTAMP")
