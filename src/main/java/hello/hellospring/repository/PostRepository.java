@@ -5,6 +5,7 @@ import hello.hellospring.domain.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,9 +20,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthorId(Long authorId);//작성자 ID를 통해 찾는 메서드
 
     List<Post> findByEmploymentTypeIsNull();//회원 유형이 NULL값을 찾는 메서드(통합 게시글)
-    @Query("SELECT p FROM Post p WHERE p.employmentType = :employmentType ORDER BY p.likes DESC")
-    List<Post> findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType employmentType);
 
+    //인기 게시글 불러오는 메서드
+    @Query("SELECT p FROM Post p WHERE p.employmentType = :employmentType ORDER BY p.likeCount DESC")
+    List<Post> findPostsByEmploymentTypeOrderByLikesDesc(@Param("employmentType") EmploymentType employmentType);
 
 }
 
