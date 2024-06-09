@@ -21,6 +21,7 @@ public class HirePostService {
         this.hirePostRepository = hirePostRepository;
     }
 
+    //채용공고 게시글 작성 서비스
     public HirePost createPost(String title, String content, double salary, Member author) {
         HirePost post = new HirePost();
         post.setTitle(title);
@@ -34,12 +35,14 @@ public class HirePostService {
 
     public List<HirePost> getAllPosts() {
         return hirePostRepository.findAll();
-    }
+    }//모든 채용공고 게시글 불러오기 서비스
 
+    //게시글 ID를 통해 불러오는 서비스
     public Optional<HirePost> getPostById(Long postId) {
         return hirePostRepository.findById(postId);
     }
 
+    //채용공고 게시글 삭제 서비스
     public void deletePost(Long postId, Long authorId,EmploymentType employmentType) {
         HirePost post = getPostById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
@@ -51,7 +54,7 @@ public class HirePostService {
         hirePostRepository.delete(post);
     }
 
-
+    //게시글 조회수 증가 서비스
     public void increaseViewCount(Long postId) {
         hirePostRepository.findById(postId).ifPresent(post -> {
             post.setViewCount(post.getViewCount() + 1);

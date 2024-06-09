@@ -20,14 +20,15 @@ public class LikeService {
         this.memberRepository = memberRepository;
     }
 
+    //좋아요 기능 서비스
     public void likePost(Long postId, Member member) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-
+        //좋아요를 누른 회원이면 다시 클릭시 좋아요 취소
         if (post.getLikes().contains(member)) {
             post.getLikes().remove(member);
             post.setLikeCount(post.getLikeCount() - 1);
-        } else {
+        } else {//좋아요를 누르지 않은 회원이면 클릭시 좋아요 증가
             post.getLikes().add(member);
             post.setLikeCount(post.getLikeCount() + 1);
         }

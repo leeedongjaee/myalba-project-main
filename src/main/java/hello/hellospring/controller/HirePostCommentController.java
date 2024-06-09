@@ -21,13 +21,13 @@ public class HirePostCommentController {
         this.commentService = commentService;
     }
 
-    @PostMapping("/{id}/comment")
+    @PostMapping("/{id}/comment")//채용 공고 게시판 댓글 작성 메서드
     public ResponseEntity<String> createComment(@PathVariable("id") Long postId, @RequestBody HirePostCommentForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-
+        //댓글을 달 수 있는 권한은 아르바이트생만 부여
         if (loggedInMember.getEmploymentType() != EmploymentType.EMPLOYEE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("알바생만 댓글을 작성할 수 있습니다.");
         }
@@ -40,13 +40,13 @@ public class HirePostCommentController {
         }
     }
 
-    @GetMapping("/{id}/comments")
+    @GetMapping("/{id}/comments")//채용 공고 게시판 댓글 불러오기 메서드
     public ResponseEntity<List<HirePostComment>> getCommentsByPostId(@PathVariable("id") Long postId) {
         List<HirePostComment> comments = commentService.getCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/comments/{commentId}")//댓글 삭제 메서드
     public ResponseEntity<String> deleteComment(@PathVariable("commentId") Long commentId, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {

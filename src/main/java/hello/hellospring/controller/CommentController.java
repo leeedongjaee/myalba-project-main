@@ -20,7 +20,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @PostMapping("/posts/{postId}/comment")
+    @PostMapping("/posts/{postId}/comment")//게시글에 댓글 달기 메서드
     public ResponseEntity<String> createComment(@PathVariable("postId") Long postId, @RequestBody CommentForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -34,7 +34,7 @@ public class CommentController {
         }
     }
 
-    @PutMapping("/posts/{postId}/comment/{commentId}")
+    @PutMapping("/posts/{postId}/comment/{commentId}")//댓글 수정 메서드
     public ResponseEntity<String> updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, @RequestBody CommentForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -49,7 +49,7 @@ public class CommentController {
         }
     }
 
-    @DeleteMapping("/posts/{postId}/comment/{commentId}")
+    @DeleteMapping("/posts/{postId}/comment/{commentId}")//댓글 삭제 메서드
     public ResponseEntity<String> deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -64,13 +64,13 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/posts/{postId}/comments")
+    @GetMapping("/posts/{postId}/comments")//댓글 불러오기 메서드
     public ResponseEntity<List<Comment>> getCommentsByPostId(@PathVariable("postId") Long postId) {
         List<Comment> comments = commentService.getCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/reply/{parentId}")
+    @PostMapping("/reply/{parentId}")//대댓글 달기 메서드
     public ResponseEntity<String> addReply(@PathVariable("parentId") Long parentId, @RequestBody CommentForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -85,7 +85,7 @@ public class CommentController {
         }
 
         Comment comment = new Comment();
-        comment.setParent(parentComment);
+        comment.setParent(parentComment);//대댓글이 속한 댓글의 ID값 저장
         comment.setAuthor(loggedInMember);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setPost(parentComment.getPost());
@@ -95,7 +95,7 @@ public class CommentController {
         commentService.saveComment(comment);
         return ResponseEntity.ok("답글이 성공적으로 추가되었습니다.");
     }
-    @GetMapping("/comments/{parentId}/replies")
+    @GetMapping("/comments/{parentId}/replies")//대댓글 불러오기 메서드
     public ResponseEntity<List<Comment>> getReplies(@PathVariable("parentId") Long parentId) {
         List<Comment> replies = commentService.getReplies(parentId);
         return ResponseEntity.ok(replies);

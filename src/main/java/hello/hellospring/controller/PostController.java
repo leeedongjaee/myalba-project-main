@@ -45,7 +45,7 @@ public class PostController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/brands/{brandName}/posts/employee/new")
+    @PostMapping("/brands/{brandName}/posts/employee/new")//{brandName}에 맞는 아르바이트 회원 게시글 작성 메서드
     public ResponseEntity<String> createEmployeePost(@PathVariable("brandName") String brandName,
                                                      @RequestParam("title") String title,
                                                      @RequestParam("content") String content,
@@ -55,7 +55,7 @@ public class PostController {
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-
+        //아르바이트생 회원만 게시글 작성 권한 부여
         if (loggedInMember.getEmploymentType() != EmploymentType.EMPLOYEE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("아르바이트생 회원만 게시글을 작성할 수 있습니다.");
         }
@@ -85,7 +85,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 성공적으로 작성되었습니다.");
     }
 
-    @PostMapping("/brands/{brandName}/posts/boss/new")
+    @PostMapping("/brands/{brandName}/posts/boss/new")//{brandName}에 맞는 자영업자 회원 게시글 작성 메서드
     public ResponseEntity<String> createBossPost(@PathVariable("brandName") String brandName,
                                                  @RequestParam("title") String title,
                                                  @RequestParam("content") String content,
@@ -95,7 +95,7 @@ public class PostController {
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-
+        //자영업자 회원만 게시글 작성 권한 부여
         if (loggedInMember.getEmploymentType() != EmploymentType.BOSS) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("자영업자 회원만 게시글을 작성할 수 있습니다.");
         }
@@ -125,7 +125,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 성공적으로 작성되었습니다.");
     }
 
-    @PostMapping("/posts/new")
+    @PostMapping("/posts/new")//통합게시판 게시글 작성 메서드
     public ResponseEntity<String> createPost(@RequestParam("title") String title,
                                              @RequestParam("content") String content,
                                              @RequestPart(value = "images", required = false) List<MultipartFile> images,
@@ -161,25 +161,25 @@ public class PostController {
         return ResponseEntity.ok("게시글 작성 폼을 보여줍니다.");
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/posts")//모든 게시글 조회 메서드
     public ResponseEntity<List<Post>> getAllPosts() {
         List<Post> posts = postService.getPostsForUnifiedBoard();
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/brands/{name}/posts/employee")
+    @GetMapping("/brands/{name}/posts/employee")//해당 브랜드 아르바이트 회원 작성 글 목록 반환 메서드
     public ResponseEntity<List<Post>> listPostsByBrandAndEmployee(@PathVariable("name") String name) {
         List<Post> posts = postService.findPostsByBrandNameAndEmploymentType(name, EmploymentType.EMPLOYEE);
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/brands/{name}/posts/boss")
+    @GetMapping("/brands/{name}/posts/boss")//해당 브랜드 자영업자 회원 작성 글 목록 반환 메서드
     public ResponseEntity<List<Post>> listPostsByBrandAndBoss(@PathVariable("name") String name) {
         List<Post> posts = postService.findPostsByBrandNameAndEmploymentType(name, EmploymentType.BOSS);
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/posts/{id}")
+    @GetMapping("/posts/{id}")//게시글 상세보기 메서드
     public ResponseEntity<Post> showPost(@PathVariable("id") Long postId) {
         return postService.getPostById(postId)
                 .map(post -> {
@@ -191,7 +191,7 @@ public class PostController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/posts/{id}")//게시글 삭제 메서드
     public ResponseEntity<String> deletePost(@PathVariable("id") Long postId, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -201,6 +201,7 @@ public class PostController {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
+            //작성자와 현재 로그인한 회원이 일치, 또는 관리자 계정일 경우 삭제 권한 부여
             if (post.getAuthor().getId().equals(loggedInMember.getId()) ||
                     loggedInMember.getEmploymentType() == EmploymentType.MASTER) {
                 postRepository.deleteById(postId);
@@ -213,7 +214,7 @@ public class PostController {
         }
     }
 
-    @PutMapping("/posts/{id}")
+    @PutMapping("/posts/{id}")//게시글 수정 메서드
     public ResponseEntity<String> updatePost(@PathVariable("id") Long postId,
                                              HttpSession session,
                                              @RequestParam("title") String title,
@@ -227,6 +228,7 @@ public class PostController {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
+            //작성자와 현재 로그인한 회원이 일치해야만 수정 가능
             if (post.getAuthor().getId().equals(loggedInMember.getId())) {
                 if (title != null) {
                     post.setTitle(title);
@@ -257,7 +259,7 @@ public class PostController {
         }
 
     }
-        @PostMapping("/posts/{postId}/like")
+        @PostMapping("/posts/{postId}/like")//게시글 좋아요 표기 메서드
     public ResponseEntity<String> likePost(@PathVariable("postId") Long postId, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -267,12 +269,12 @@ public class PostController {
         likeService.likePost(postId, loggedInMember);
         return ResponseEntity.ok("Liked");
     }
-    @GetMapping("/posts/hot/employee")
+    @GetMapping("/posts/hot/employee")//아르바이트 회원 인기 게시글 조회 메서드
     public ResponseEntity<List<Post>> listPostsByLikeAndEmployee() {
         List<Post> posts = postService.findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType.EMPLOYEE);
         return ResponseEntity.ok(posts);
     }
-    @GetMapping("/posts/hot/boss")
+    @GetMapping("/posts/hot/boss")//자영업자 회원 인기 게시글 조회 메서드
     public ResponseEntity<List<Post>> listPostsByLikeAndBoss() {
         List<Post> posts = postService.findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType.BOSS);
         return ResponseEntity.ok(posts);

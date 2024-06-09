@@ -28,7 +28,7 @@ public class BrandController {
                 .orElseGet(() -> ResponseEntity.status(404).body(null));
     }
 
-    @GetMapping("/top")
+    @GetMapping("/top")//브랜드 평점 평균 높은 순위로 출력 메서드
     public ResponseEntity<List<BrandResponse>> getTopRatedBrands() {
         List<Brand> brands = brandService.getBrandsOrderByAverageRating();
         List<BrandResponse> response = brands.stream()
@@ -37,7 +37,7 @@ public class BrandController {
         return ResponseEntity.ok(response);
     }
 
-    // BrandResponse 클래스 정의
+    // BrandResponse 클래스 정의(브랜드 평점 평균 관리)
     public static class BrandResponse {
         private String name;
         private double averageRating;

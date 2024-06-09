@@ -30,7 +30,9 @@ public class ReviewService {
         this.allowVerifiedMemberRepository=allowVerifiedMemberRepository;
     }
 
+    //리뷰 저장 서비스
     public Review saveReview(Long brandId, Long memberId, String content, double rating) {
+        //근로계약서 인증 된 회원만 작성 권한 부여
         if (!allowVerifiedMemberRepository.existsByMemberIdAndBrandId(memberId, brandId)) {
             throw new IllegalArgumentException("인증된 사용자만 리뷰를 작성할 수 있습니다.");
         }
@@ -48,6 +50,8 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+
+    //실시간으로 브랜드 평점 평균 저장 서비스
     @Transactional
     public void updateBrandAverageRating(Long brandId) {
         List<Review> reviews = reviewRepository.findByBrandId(brandId);
@@ -61,5 +65,5 @@ public class ReviewService {
 
     public List<Review> findReviewsByBrandId(Long brandId) {
         return reviewRepository.findByBrandId(brandId);
-    }
+    }//브랜드 ID를 통해 리뷰 찾는 서비스
 }

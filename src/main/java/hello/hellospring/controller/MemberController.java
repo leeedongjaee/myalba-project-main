@@ -35,9 +35,8 @@ public class MemberController {
         return ResponseEntity.ok("회원 가입 폼을 보여줍니다.");
     }
 
-    @PostMapping("/members/new/employee") // 새로운 회원 가입 시스템
+    @PostMapping("/members/new/employee") // 아르바이트생 회원 가입 메서드
     public ResponseEntity<String> createemployee(@RequestBody MemberForm form) {
-        // 이메일 중복 확인
         ResponseEntity<String> BAD_REQUEST = joinvalidation(form);
         if (BAD_REQUEST != null) return BAD_REQUEST;
         // 회원 정보 생성 및 저장
@@ -47,24 +46,24 @@ public class MemberController {
         member.setEmail(form.getEmail());
         member.setPassword1(form.getPassword1());
         member.setPassword2(form.getPassword2());
-        member.setEmploymentType(EmploymentType.EMPLOYEE);
+        member.setEmploymentType(EmploymentType.EMPLOYEE);//enum값 EMPLOYEE로 지정하여 저장(아르바이트 회원 구분)
         memberService.join(member);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("알바생 회원 가입이 완료되었습니다.");
     }
 
-    @PostMapping("/members/new/boss") // 새로운 회원 가입 시스템
+    @PostMapping("/members/new/boss") // 자영업자 회원 가입 메서드
     public ResponseEntity<String> createboss(@RequestBody MemberForm form) {
         ResponseEntity<String> BAD_REQUEST = joinvalidation(form);
         if (BAD_REQUEST != null) return BAD_REQUEST;
-//         회원 정보 생성 및 저장
+        //회원 정보 생성 및 저장
         Member member = new Member();
         member.setName(form.getName());
         member.setNickname(form.getNickname());
         member.setEmail(form.getEmail());
         member.setPassword1(form.getPassword1());
         member.setPassword2(form.getPassword2());
-        member.setEmploymentType(EmploymentType.BOSS);
+        member.setEmploymentType(EmploymentType.BOSS);//enum값 BOSS로 지정하여 저장(자영업자 회원 구분)
         memberService.join(member);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("자영업자 회원 가입이 완료되었습니다.");
@@ -98,7 +97,7 @@ public class MemberController {
         return null;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login")//로그인 메서드
     public ResponseEntity<?> login(@RequestBody MemberForm form, HttpSession session) {
         System.out.println("로그인 시도: " + form.getEmail() + ", " + form.getPassword1());
         Optional<Member> loginResult = memberService.login(form.getEmail(), form.getPassword1());
@@ -112,16 +111,14 @@ public class MemberController {
 
 
 
-    @GetMapping("/logout")
+    @GetMapping("/logout")//로그아웃 메서드
     public ResponseEntity<String> logout(HttpSession session) {
-        // 로그아웃 로직을 수행합니다.
         session.invalidate();
         return ResponseEntity.ok("로그아웃이 성공적으로 완료되었습니다.");
     }
 
-    @GetMapping("/profile")
+    @GetMapping("/profile")//프로필 정보 반환 메서드
     public ResponseEntity<Map<String, Object>> showProfile(HttpSession session) {
-        // 프로필 정보를 반환합니다.
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -136,9 +133,8 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/profile/updateNickname")
+    @PostMapping("/profile/updateNickname")//회원 닉네임 수정 메서드
     public ResponseEntity<String> updateNickname(@RequestBody Map<String, String> request, HttpSession session) {
-        // 닉네임 변경 로직을 수행합니다.
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -155,10 +151,10 @@ public class MemberController {
 
         loggedInMember.setNickname(newNickname);
         memberService.updateMember(loggedInMember);
-        session.setAttribute("loggedInMember", loggedInMember); // 세션 정보 업데이트
+        session.setAttribute("loggedInMember", loggedInMember); // 세션 정보 업데이트하여 새로운 닉네임 표기
         return ResponseEntity.ok("닉네임이 성공적으로 변경되었습니다.");
     }
-    @GetMapping("/members/{memberId}/profile")
+    @GetMapping("/members/{memberId}/profile")//다른 사용자 프로필 정보 반환 메서드
     public ResponseEntity<Map<String, Object>> viewProfile(@PathVariable("memberId") Long memberId) {
         Optional<Member> memberOpt = memberService.findById(memberId);
         if (memberOpt.isEmpty()) {

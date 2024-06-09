@@ -26,14 +26,15 @@ public class CommentService {
         this.memberService = memberService;
     }
 
+    //댓글 작성 서비스
     public Comment createComment(Long postId, Long authorId, String content, Long parentId) {
         Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
         Member author = memberService.findOne(authorId).orElseThrow(() -> new IllegalArgumentException("Invalid author ID"));
 
-        // 게시글 작성자 유형과 댓글 작성자 유형 비교
+        //게시글 작성자 유형과 댓글 작성자 유형 비교
         EmploymentType postAuthorEmploymentType = post.getAuthor().getEmploymentType();
         EmploymentType commentAuthorEmploymentType = author.getEmploymentType();
-
+        //게시글 분류에 맞게 댓글 작성 권한 부여
         if ((postAuthorEmploymentType == EmploymentType.EMPLOYEE && commentAuthorEmploymentType == EmploymentType.BOSS) ||
                 (postAuthorEmploymentType == EmploymentType.BOSS && commentAuthorEmploymentType == EmploymentType.EMPLOYEE)) {
             throw new IllegalArgumentException("댓글을 달 수 없습니다. 작성자 유형에 따른 제한이 있습니다.");
@@ -50,11 +51,12 @@ public class CommentService {
         comment.setAuthor(author);
         comment.setContent(content);
         comment.setCreatedAt(LocalDateTime.now());
-        comment.setParent(parent); // parent를 null로 설정하는 부분 수정
+        comment.setParent(parent);
 
         return commentRepository.save(comment);
     }
 
+    //댓글 수정 서비스
     public void updateComment(Long postId, Long commentId, Long authorId, String content) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재 하지 않습니다."));
@@ -62,9 +64,11 @@ public class CommentService {
         if (!comment.getPost().getId().equals(postId)) {
             throw new IllegalArgumentException("Comment does not belong to the post");
         }
+        //삭제된 댓글 수정 방지
         if (comment.isDeleted()) {
             throw new IllegalArgumentException("삭제된 댓글은 수정할 수 없습니다.");
         }
+        //작성자와 현재 로그인 한 회원이 일치해야 수정 허용
         if (!comment.getAuthor().getId().equals(authorId)) {
             throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
@@ -73,6 +77,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    //댓글 삭제 서비스
     public void deleteComment(Long postId, Long commentId, Long authorId, EmploymentType employmentType) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID"));
@@ -80,7 +85,7 @@ public class CommentService {
         if (!comment.getPost().getId().equals(postId)) {
             throw new IllegalArgumentException("Comment does not belong to the post");
         }
-
+        //작성자와 현재 로그인 한 회원이 일치, 또는 관리자 계정일 경우 삭제 허용
         if (!comment.getAuthor().getId().equals(authorId) && employmentType != EmploymentType.MASTER) {
             throw new IllegalArgumentException("댓글 작성자가 아니거나 관리자 권한이 없습니다.");
         }
@@ -96,16 +101,16 @@ public class CommentService {
 
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostId(postId);
-    }
+    }//게시글 ID를 통해 댓글 찾는 서비스
 
     public List<Comment> getReplies(Long parentId) {
         return commentRepository.findByParentId(parentId);
-    }
+    }//대댓글을 찾는 메서드
     public Optional<Comment> getCommentById(Long commentId) {
         return commentRepository.findById(commentId);
-    }
+    }//ID를 통해 댓글을 찾는 서비스
 
     public void saveComment(Comment comment) {
         commentRepository.save(comment);
-    }
+    }//댓글 저장 서비스
 }

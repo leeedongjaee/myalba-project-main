@@ -19,20 +19,19 @@ public class BrandService {
 
     public Optional<Brand> findBrandByName(String name) {
         return brandRepository.findByName(name);
-    }
+    }//이름을 통해 브랜드를 찾는 서비스
 
     public Optional<Long> findBrandIdByName(String name) {
         return brandRepository.findByName(name).map(Brand::getId);
-    }
+    }//브랜드 이름을 통해 브랜드 ID를 찾는 서비스
 
-    // 새로운 메서드 추가
     public List<Brand> getAllBrands() {
         return brandRepository.findAll();
-    }
+    }//모든 브랜드를 불러오는 서비스
     public List<Brand> getBrandsOrderByAverageRating() {
         return brandRepository.findAllOrderByAverageRatingDesc();
-    }
+    }//브랜드의 평점 평균을 불러오는 서비스
     public Optional<Brand> findById(Long id) {
         return brandRepository.findById(id);
-    }
+    }//ID를 통해 찾는 서비스
 }

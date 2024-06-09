@@ -31,7 +31,7 @@ public class AllowController {
         this.brandService=brandService;
     }
 
-    @PostMapping("/new")
+    @PostMapping("/new")//근로계약서 인증 글 저장 메서드
     public ResponseEntity<String> createAllow(@RequestParam("title") String title,
                                               @RequestParam("content") String content,
                                               @RequestParam("brandId") Long brandId,
@@ -62,7 +62,7 @@ public class AllowController {
         return ResponseEntity.status(HttpStatus.CREATED).body("근로계약서 인증 게시글이 성공적으로 생성되었습니다.");
     }
 
-    @GetMapping
+    @GetMapping//근로계약서 인증 글 목록 확인 메서드
     public ResponseEntity<?> getAllAllows(HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
@@ -72,7 +72,7 @@ public class AllowController {
         return ResponseEntity.ok(allows);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")//근로계약서 인증 글 상세보기
     public ResponseEntity<?> getAllowById(@PathVariable Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
@@ -82,7 +82,7 @@ public class AllowController {
         return allow.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")//근로계약서 인증 글 삭제 메서드
     public ResponseEntity<?> deleteAllow(@PathVariable Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
@@ -92,7 +92,7 @@ public class AllowController {
         return ResponseEntity.ok("근로계약서 인증 게시글이 삭제되었습니다.");
     }
 
-    @PostMapping("/approve")
+    @PostMapping("/approve")//근로계약서 인증 허가 메서드
     public ResponseEntity<?> approveAllow(@RequestBody Map<String, Long> request, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
@@ -104,7 +104,7 @@ public class AllowController {
         return ResponseEntity.ok("회원이 인증되었습니다.");
     }
 
-    @PostMapping("/reject")
+    @PostMapping("/reject")//근로계약서 인증 거부 메서드
     public ResponseEntity<?> rejectAllow(@RequestBody Map<String, Long> request, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {

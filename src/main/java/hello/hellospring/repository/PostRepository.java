@@ -12,13 +12,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 게시글 저장 메서드 추가
     Post save(Post post);
 
-    List<Post> findByBrandId(Long id);
+    List<Post> findByBrandId(Long id);//브랜드 ID를 통해 찾는 메서드
 
-    List<Post> findByBrandName(String brandName);
-    List<Post> findByBrandNameAndEmploymentType(String brandName, EmploymentType employmentType);
-    List<Post> findByAuthorId(Long authorId);
+    List<Post> findByBrandName(String brandName);//브랜드 이름을 통해 찾는 메서드
+    List<Post> findByBrandNameAndEmploymentType(String brandName, EmploymentType employmentType);//브랜드 이름과 회원 유형을 통해 찾는 메서드
+    List<Post> findByAuthorId(Long authorId);//작성자 ID를 통해 찾는 메서드
 
-    List<Post> findByEmploymentTypeIsNull();
+    List<Post> findByEmploymentTypeIsNull();//회원 유형이 NULL값을 찾는 메서드(통합 게시글)
     @Query("SELECT p FROM Post p WHERE p.employmentType = :employmentType ORDER BY p.likes DESC")
     List<Post> findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType employmentType);
 

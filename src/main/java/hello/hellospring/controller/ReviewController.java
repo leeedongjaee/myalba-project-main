@@ -23,12 +23,13 @@ public class ReviewController {
         this.brandService = brandService;
     }
 
-    @PostMapping
+    @PostMapping//브랜드 한줄 평가 및 평점 부여 메서드
     public ResponseEntity<String> createReview(@PathVariable("name") String name, @RequestBody ReviewForm form, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인시 사용 가능합니다.");
         }
+        //아르바이트 회원에게만 작성 권한 부여
         if (loggedInMember.getEmploymentType() != EmploymentType.EMPLOYEE) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("아르바이트생 회원만 작성 가능합니다.");
         }
@@ -42,7 +43,7 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    @GetMapping
+    @GetMapping//해당 브랜드의 한줄 평가 목록 반환 메서드
     public ResponseEntity<List<Review>> listReviewsByBrand(@PathVariable("name") String name) {
         Long brandId = brandService.findBrandIdByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid brand name"));

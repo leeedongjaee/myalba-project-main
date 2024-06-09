@@ -24,6 +24,7 @@ public class HirePostCommentService {
         this.postRepository = postRepository;
     }
 
+    //채용공고 게시글 댓글 작성 서비스
     public HirePostComment createComment(Long postId, Long authorId, String content) {
         HirePost post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
@@ -31,7 +32,7 @@ public class HirePostCommentService {
         HirePostComment comment = new HirePostComment();
         comment.setPost(post);
         comment.setAuthor(new Member());
-        comment.getAuthor().setId(authorId); // Assuming Member entity is already managed
+        comment.getAuthor().setId(authorId);
         comment.setContent(content);
         comment.setCreatedAt(LocalDateTime.now());
 
@@ -40,8 +41,9 @@ public class HirePostCommentService {
 
     public List<HirePostComment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostId(postId);
-    }
+    }//게시글 ID를 통해 댓글 찾는 서비스
 
+    //댓글 삭제 서비스
     public void deleteComment(Long commentId, Long authorId, EmploymentType employmentType) {
         HirePostComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID"));

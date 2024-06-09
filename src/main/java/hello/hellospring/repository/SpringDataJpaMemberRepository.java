@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface SpringDataJpaMemberRepository extends JpaRepository<Member,Long>,MemberRepository {
 
     @Override
-    Optional<Member> findByName(String name);
+    Optional<Member> findByName(String name);//이름을 통해 찾는 메서드
 }
