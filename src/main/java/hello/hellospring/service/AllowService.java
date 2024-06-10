@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,13 +39,9 @@ public class AllowService {
     }
 
         //근로계약서 인증 글 작성 서비스
-        public void createAllow(Allow allow, List<MultipartFile> images) throws IOException {
-        if (images != null && !images.isEmpty()) {
-            List<String> imageUrls = saveImages(images);
-            allow.setImageUrls(imageUrls);
+        public void createAllow(Allow allow) {
+            allowRepository.save(allow);
         }
-        allowRepository.save(allow);
-    }
 
     public List<Allow> getAllAllows() {
         return allowRepository.findAll();
@@ -66,20 +63,33 @@ public class AllowService {
         allowVerifiedMemberRepository.save(verifiedMember);
     }//인증 글 허가 서비스
 
-    private List<String> saveImages(List<MultipartFile> images) throws IOException {
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile image : images) {
-            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
-            Files.copy(image.getInputStream(), filePath);
-            imageUrls.add("/upload-dir/" + fileName);
-        }
-        return imageUrls;
-    }//인증 글에 이미지 처리 서비스
     public void rejectAllow(Long allowId) {
         allowRepository.deleteById(allowId);
     }//인증 글 거부 서비스
     public boolean isVerifiedMember(Long memberId, Long brandId) {
         return allowVerifiedMemberRepository.existsByMemberIdAndBrandId(memberId, brandId);
     }//회원이 해당 브랜드에 인증되었는지 찾는 서비스
+
+    // 이미지 저장 서비스 (PostService와 동일한 메서드 사용)
+    public List<String> saveImages(List<MultipartFile> images) throws IOException {
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile image : images) {
+            String fileName = saveImage(image);
+            String fileUrl = "/images/" + fileName; // URL 경로
+            imageUrls.add(fileUrl);
+        }
+        return imageUrls;
+    }
+
+    // 이미지 저장 메서드 (PostService와 동일한 메서드 사용)
+    private String saveImage(MultipartFile image) throws IOException {
+        String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, fileName);
+        File file = new File(filePath.toString());
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        image.transferTo(filePath.toFile());
+        return fileName;
+    }
 }

@@ -31,13 +31,14 @@ public class CommentService {
         Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
         Member author = memberService.findOne(authorId).orElseThrow(() -> new IllegalArgumentException("Invalid author ID"));
 
-        //게시글 작성자 유형과 댓글 작성자 유형 비교
-        EmploymentType postAuthorEmploymentType = post.getAuthor().getEmploymentType();
-        EmploymentType commentAuthorEmploymentType = author.getEmploymentType();
-        //게시글 분류에 맞게 댓글 작성 권한 부여
-        if ((postAuthorEmploymentType == EmploymentType.EMPLOYEE && commentAuthorEmploymentType == EmploymentType.BOSS) ||
-                (postAuthorEmploymentType == EmploymentType.BOSS && commentAuthorEmploymentType == EmploymentType.EMPLOYEE)) {
-            throw new IllegalArgumentException("댓글을 달 수 없습니다. 작성자 유형에 따른 제한이 있습니다.");
+        // 통합게시판이 아닌 경우에만 댓글 작성자 유형 제한을 적용
+        if (post.getBrand() != null) {
+            EmploymentType postAuthorEmploymentType = post.getAuthor().getEmploymentType();
+            EmploymentType commentAuthorEmploymentType = author.getEmploymentType();
+            if ((postAuthorEmploymentType == EmploymentType.EMPLOYEE && commentAuthorEmploymentType == EmploymentType.BOSS) ||
+                    (postAuthorEmploymentType == EmploymentType.BOSS && commentAuthorEmploymentType == EmploymentType.EMPLOYEE)) {
+                throw new IllegalArgumentException("댓글을 달 수 없습니다. 작성자 유형에 따른 제한이 있습니다.");
+            }
         }
 
         Comment parent = null;

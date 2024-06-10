@@ -126,7 +126,8 @@ public class PostController {
     }
 
     @PostMapping("/posts/new")//통합게시판 게시글 작성 메서드
-    public ResponseEntity<String> createPost(@RequestBody Map<String, String> postRequest,
+    public ResponseEntity<String> createPost(@RequestParam("title") String title,
+                                             @RequestParam("content") String content,
                                              @RequestPart(value = "images", required = false) List<MultipartFile> images,
                                              HttpSession session) throws IOException {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
@@ -134,15 +135,12 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        String title = postRequest.get("title");
-        String content = postRequest.get("content");
-
         Post post = new Post();
         post.setTitle(title);
         post.setContent(content);
         post.setCreatedAt(LocalDateTime.now());
         post.setAuthor(loggedInMember);
-        post.setEmploymentType(null);
+        post.setEmploymentType(null); // 통합 게시판에서는 EmploymentType을 사용하지 않음
         post.setLikeCount(0);
         post.setViewCount(0);
 

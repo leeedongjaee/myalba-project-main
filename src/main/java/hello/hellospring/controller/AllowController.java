@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,8 +37,8 @@ public class AllowController {
     public ResponseEntity<String> createAllow(@RequestParam("title") String title,
                                               @RequestParam("content") String content,
                                               @RequestParam("brandName") String brandName,
-                                              @RequestParam(value = "images", required = false) List<MultipartFile> images,
-                                              HttpSession session) {
+                                              @RequestPart(value = "images", required = false) List<MultipartFile> images,
+                                              HttpSession session) throws IOException {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -50,14 +52,17 @@ public class AllowController {
         Allow allow = new Allow();
         allow.setTitle(title);
         allow.setContent(content);
-        allow.setBrand(brandOptional.get());
         allow.setMember(loggedInMember);
+        allow.setBrand(brandOptional.get());
 
-        try {
-            allowService.createAllow(allow, images);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 저장에 실패했습니다.");
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = allowService.saveImages(images);
+            allow.setImageUrls(imageUrls);
+        } else {
+            allow.setImageUrls(Collections.emptyList());
         }
+
+        allowService.createAllow(allow);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("근로계약서 인증 게시글이 성공적으로 생성되었습니다.");
     }
@@ -72,9 +77,6 @@ public class AllowController {
     @GetMapping("/{id}")//근로계약서 인증 글 상세보기
     public ResponseEntity<?> getAllowById(@PathVariable Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
-        }
         Optional<Allow> allow = allowService.getAllowById(id);
         return allow.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -82,9 +84,6 @@ public class AllowController {
     @DeleteMapping("/{id}")//근로계약서 인증 글 삭제 메서드
     public ResponseEntity<?> deleteAllow(@PathVariable Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
-        }
         allowService.deleteAllow(id);
         return ResponseEntity.ok("근로계약서 인증 게시글이 삭제되었습니다.");
     }
@@ -92,9 +91,6 @@ public class AllowController {
     @PostMapping("/approve")//근로계약서 인증 허가 메서드
     public ResponseEntity<?> approveAllow(@RequestBody Map<String, Long> request, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
-        }
         Long allowId = request.get("allowId");
 
         allowService.approveAllow(allowId);
@@ -104,9 +100,6 @@ public class AllowController {
     @PostMapping("/reject")//근로계약서 인증 거부 메서드
     public ResponseEntity<?> rejectAllow(@RequestBody Map<String, Long> request, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
-        }
         Long allowId = request.get("allowId");
 
         allowService.rejectAllow(allowId);
