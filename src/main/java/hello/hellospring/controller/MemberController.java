@@ -1,8 +1,5 @@
 package hello.hellospring.controller;
-import hello.hellospring.domain.AllowVerifiedMember;
-import hello.hellospring.domain.EmploymentType;
-import hello.hellospring.domain.Member;
-import hello.hellospring.domain.Post;
+import hello.hellospring.domain.*;
 import hello.hellospring.repository.AllowVerifiedMemberRepository;
 import hello.hellospring.service.MemberService;
 import hello.hellospring.service.PostService;
@@ -139,7 +136,7 @@ public class MemberController {
         Map<String, Object> response = new HashMap<>();
         response.put("member", loggedInMember);
         response.put("posts", userPosts);
-        response.put("brands", brandNames);
+        response.put("brands", brandNames);//인증된 브랜드 목록 반환
 
         return ResponseEntity.ok(response);
     }
@@ -166,7 +163,7 @@ public class MemberController {
         session.setAttribute("loggedInMember", loggedInMember); // 세션 정보 업데이트하여 새로운 닉네임 표기
         return ResponseEntity.ok("닉네임이 성공적으로 변경되었습니다.");
     }
-    @GetMapping("/members/{memberId}/profile")//다른 사용자 프로필 정보 반환 메서드
+    @GetMapping("/members/{memberId}/profile") // 다른 사용자 프로필 정보 반환 메서드
     public ResponseEntity<Map<String, Object>> viewProfile(@PathVariable("memberId") Long memberId) {
         Optional<Member> memberOpt = memberService.findById(memberId);
         if (memberOpt.isEmpty()) {
@@ -176,9 +173,16 @@ public class MemberController {
         Member member = memberOpt.get();
         List<Post> userPosts = postService.findPostsByAuthorId(memberId);
 
+        // 인증된 브랜드 목록 조회
+        List<AllowVerifiedMember> verifiedMembers = allowVerifiedMemberRepository.findByMemberId(memberId);
+        List<Brand> verifiedBrands = verifiedMembers.stream()
+                .map(AllowVerifiedMember::getBrand)
+                .collect(Collectors.toList());
+
         Map<String, Object> response = new HashMap<>();
         response.put("member", member);
         response.put("posts", userPosts);
+        response.put("verifiedBrands", verifiedBrands);
 
         return ResponseEntity.ok(response);
     }
