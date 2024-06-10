@@ -3,7 +3,7 @@ package hello.hellospring.controller;
 public class HirePostForm {
     private String title;
     private String content;
-    private double hourlyWage;
+    private double salary;
 
     // Getters and Setters
     public String getTitle() {
@@ -22,11 +22,11 @@ public class HirePostForm {
         this.content = content;
     }
 
-    public double getHourlyWage() {
-        return hourlyWage;
+    public double getSalary() {
+        return salary;
     }
 
-    public void setHourlyWage(double hourlyWage) {
-        this.hourlyWage = hourlyWage;
+    public void setSalary(double salary) {
+        this.salary = salary;
     }
 }
