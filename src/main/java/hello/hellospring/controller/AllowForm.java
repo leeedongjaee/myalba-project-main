@@ -1,10 +1,19 @@
 package hello.hellospring.controller;
 
+import java.beans.ConstructorProperties;
+
 public class AllowForm {
 
     private String title;
     private String content;
     private Long brandId;
+
+    @ConstructorProperties({"title", "content", "brandId"})
+    public AllowForm(String title, String content, Long brandId) {
+        this.title = title;
+        this.content = content;
+        this.brandId = brandId;
+    }
 
     // Getters and Setters
     public String getTitle() {

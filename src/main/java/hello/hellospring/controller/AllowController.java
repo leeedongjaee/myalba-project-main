@@ -33,10 +33,10 @@ public class AllowController {
         this.brandService=brandService;
     }
 
-    @PostMapping("/new")//근로계약서 인증 글 저장 메서드
-    public ResponseEntity<String> createAllow(@RequestParam("title") String title,
+    @PostMapping("/new/{brandName}")//근로계약서 인증 글 작성 메서드
+    public ResponseEntity<String> createAllow(@PathVariable("brandName") String brandName,
+                                              @RequestParam("title") String title,
                                               @RequestParam("content") String content,
-                                              @RequestParam("brandName") String brandName,
                                               @RequestPart(value = "images", required = false) List<MultipartFile> images,
                                               HttpSession session) throws IOException {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
@@ -44,16 +44,14 @@ public class AllowController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        Optional<Brand> brandOptional = brandService.findBrandByName(brandName);
-        if (!brandOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 브랜드 이름입니다.");
-        }
+        Brand brand = brandService.findBrandByName(brandName)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid brand name: " + brandName));
 
         Allow allow = new Allow();
         allow.setTitle(title);
         allow.setContent(content);
         allow.setMember(loggedInMember);
-        allow.setBrand(brandOptional.get());
+        allow.setBrand(brand); // 브랜드 설정
 
         if (images != null && !images.isEmpty()) {
             List<String> imageUrls = allowService.saveImages(images);
@@ -64,16 +62,8 @@ public class AllowController {
 
         allowService.createAllow(allow);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("근로계약서 인증 게시글이 성공적으로 생성되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 성공적으로 작성되었습니다.");
     }
-
-    @GetMapping//근로계약서 인증 글 목록 확인 메서드
-    public ResponseEntity<?> getAllAllows(HttpSession session) {
-        Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        List<Allow> allows = allowService.getAllAllows();
-        return ResponseEntity.ok(allows);
-    }
-
     @GetMapping("/{id}")//근로계약서 인증 글 상세보기
     public ResponseEntity<?> getAllowById(@PathVariable Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");

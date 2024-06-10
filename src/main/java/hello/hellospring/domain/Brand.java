@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Brand {
@@ -20,6 +21,17 @@ public class Brand {
     private List<Post> posts;
     @OneToMany(mappedBy = "brand")
     private List<Review> reviews;
+
+    public List<Allow> getAllows() {
+        return allows;
+    }
+
+    public void setAllows(List<Allow> allows) {
+        this.allows = allows;
+    }
+
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Allow> allows;
 
     private double averageRating; // 평균 평점 필드 추가
 

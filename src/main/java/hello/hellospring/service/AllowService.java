@@ -2,8 +2,11 @@ package hello.hellospring.service;
 
 import hello.hellospring.domain.Allow;
 import hello.hellospring.domain.AllowVerifiedMember;
+import hello.hellospring.domain.Brand;
+import hello.hellospring.domain.Member;
 import hello.hellospring.repository.AllowRepository;
 import hello.hellospring.repository.AllowVerifiedMemberRepository;
+import hello.hellospring.repository.BrandRepository;
 import hello.hellospring.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,22 +30,24 @@ public class AllowService {
     private final AllowRepository allowRepository;
     private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
     private final MemberRepository memberRepository;
+    private final BrandRepository brandRepository;
 
     @Value("${file.upload-dir}")//이미지 파일 경로 지정
     private String uploadDir;
 
     @Autowired
-    public AllowService(AllowRepository allowRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository, MemberRepository memberRepository) {
+    public AllowService(AllowRepository allowRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository, MemberRepository memberRepository,BrandRepository brandRepository) {
         this.allowRepository = allowRepository;
         this.allowVerifiedMemberRepository = allowVerifiedMemberRepository;
         this.memberRepository = memberRepository;
+        this.brandRepository=brandRepository;
     }
 
         //근로계약서 인증 글 작성 서비스
+        @Transactional
         public void createAllow(Allow allow) {
             allowRepository.save(allow);
         }
-
     public List<Allow> getAllAllows() {
         return allowRepository.findAll();
     }//인증 글 목록 조회 서비스

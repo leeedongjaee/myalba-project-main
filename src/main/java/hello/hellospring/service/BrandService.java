@@ -34,4 +34,8 @@ public class BrandService {
     public Optional<Brand> findById(Long id) {
         return brandRepository.findById(id);
     }//ID를 통해 찾는 서비스
+
+    public Optional<Brand> findBrandById(Long brandId) {
+        return brandRepository.findById(brandId);
+    }
 }
