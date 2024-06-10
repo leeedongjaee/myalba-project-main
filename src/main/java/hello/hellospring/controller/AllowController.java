@@ -1,8 +1,10 @@
 package hello.hellospring.controller;
 
 import hello.hellospring.domain.Allow;
+import hello.hellospring.domain.AllowVerifiedMember;
 import hello.hellospring.domain.Brand;
 import hello.hellospring.domain.Member;
+import hello.hellospring.repository.AllowVerifiedMemberRepository;
 import hello.hellospring.service.AllowService;
 import hello.hellospring.service.BrandService;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +28,8 @@ public class AllowController {
     private final AllowService allowService;
     private final BrandService brandService;
 
+    @Autowired
+    private AllowVerifiedMemberRepository allowVerifiedMemberRepository;
 
     @Autowired
     public AllowController(AllowService allowService,BrandService brandService) {
@@ -64,27 +68,58 @@ public class AllowController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 성공적으로 작성되었습니다.");
     }
-    @GetMapping("/{id}")//근로계약서 인증 글 상세보기
-    public ResponseEntity<?> getAllowById(@PathVariable Long id, HttpSession session) {
+    @GetMapping("/{brandName}/{id}")//근로계약서 인증 글 상세보기
+    public ResponseEntity<?> getAllowById(@PathVariable("brandName") String brandName,@PathVariable("id") Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         Optional<Allow> allow = allowService.getAllowById(id);
         return allow.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @DeleteMapping("/{id}")//근로계약서 인증 글 삭제 메서드
-    public ResponseEntity<?> deleteAllow(@PathVariable Long id, HttpSession session) {
+    public ResponseEntity<?> deleteAllow(@PathVariable("id")  Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         allowService.deleteAllow(id);
         return ResponseEntity.ok("근로계약서 인증 게시글이 삭제되었습니다.");
     }
 
-    @PostMapping("/approve")//근로계약서 인증 허가 메서드
-    public ResponseEntity<?> approveAllow(@RequestBody Map<String, Long> request, HttpSession session) {
+    @PostMapping("/{brandName}/{id}/approve")//근로계약서 인증 허가 메서드
+    public ResponseEntity<?> approveAllow(@PathVariable("brandName") String brandName, @PathVariable("id") Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        Long allowId = request.get("allowId");
 
-        allowService.approveAllow(allowId);
-        return ResponseEntity.ok("회원이 인증되었습니다.");
+        if (loggedInMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        Brand brand = brandService.findBrandByName(brandName)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid brand name: " + brandName));
+
+        System.out.println("Brand ID: " + brand.getId()); // 로그 출력
+
+        try {
+            Allow allow = allowService.findAllowById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid allow ID"));
+
+            // AllowVerifiedMember 객체 생성 및 저장
+            AllowVerifiedMember verifiedMember = new AllowVerifiedMember();
+            verifiedMember.setMember(allow.getMember()); // 글 작성자
+            verifiedMember.setBrand(brand); // 해당 브랜드
+
+            System.out.println("AllowVerifiedMember Brand ID: " + verifiedMember.getBrand().getId()); // 로그 출력
+
+            allowVerifiedMemberRepository.save(verifiedMember);
+
+            // 확인을 위해 저장된 객체 출력
+            AllowVerifiedMember savedVerifiedMember = allowVerifiedMemberRepository.findById(verifiedMember.getId()).orElse(null);
+            if (savedVerifiedMember != null) {
+                System.out.println("Saved AllowVerifiedMember Brand ID: " + savedVerifiedMember.getBrand().getId());
+            } else {
+                System.out.println("AllowVerifiedMember 저장 실패");
+            }
+
+            return ResponseEntity.ok("인증이 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping("/reject")//근로계약서 인증 거부 메서드
@@ -94,6 +129,12 @@ public class AllowController {
 
         allowService.rejectAllow(allowId);
         return ResponseEntity.ok("근로계약서 인증 요청이 거부되었습니다.");
+    }
+    @GetMapping // 근로계약서 인증 글 목록 확인 메서드
+    public ResponseEntity<?> getAllAllows(HttpSession session) {
+        Member loggedInMember = (Member) session.getAttribute("loggedInMember");
+        List<Allow> allows = allowService.getAllAllows();
+        return ResponseEntity.ok(allows);
     }
 }
 

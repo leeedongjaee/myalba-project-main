@@ -48,8 +48,13 @@ public class AllowService {
         public void createAllow(Allow allow) {
             allowRepository.save(allow);
         }
+    @Transactional(readOnly = true)
     public List<Allow> getAllAllows() {
-        return allowRepository.findAll();
+        List<Allow> allows = allowRepository.findAll();
+        for (Allow allow : allows) {
+            allow.getBrand().getName(); // Lazy Loading 문제 해결
+        }
+        return allows;
     }//인증 글 목록 조회 서비스
 
     public Optional<Allow> getAllowById(Long id) {
@@ -60,13 +65,7 @@ public class AllowService {
         allowRepository.deleteById(id);
     }//인증 글 삭제 서비스
 
-    public void approveAllow(Long allowId) {
-        Allow allow = allowRepository.findById(allowId).orElseThrow(() -> new IllegalArgumentException("Invalid allow ID"));
-        AllowVerifiedMember verifiedMember = new AllowVerifiedMember();
-        verifiedMember.setMember(allow.getMember());
-        verifiedMember.setBrand(allow.getBrand());
-        allowVerifiedMemberRepository.save(verifiedMember);
-    }//인증 글 허가 서비스
+
 
     public void rejectAllow(Long allowId) {
         allowRepository.deleteById(allowId);
@@ -96,5 +95,8 @@ public class AllowService {
         }
         image.transferTo(filePath.toFile());
         return fileName;
+    }
+    public Optional<Allow> findAllowById(Long id) {
+        return allowRepository.findById(id);
     }
 }

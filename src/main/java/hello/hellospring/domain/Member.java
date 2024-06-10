@@ -1,7 +1,9 @@
 package hello.hellospring.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.Base64;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -17,6 +19,18 @@ public class Member {
     private String password2;
     @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
+
+    public List<Allow> getAllows() {
+        return allows;
+    }
+
+    public void setAllows(List<Allow> allows) {
+        this.allows = allows;
+    }
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("member")
+    private List<Allow> allows;
 
     public Member() {}
 

@@ -1,6 +1,8 @@
 package hello.hellospring.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -30,7 +32,8 @@ public class Brand {
         this.allows = allows;
     }
 
-    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("brand")
     private List<Allow> allows;
 
     private double averageRating; // 평균 평점 필드 추가
