@@ -19,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -214,7 +211,7 @@ public class PostController {
         }
     }
 
-    @PutMapping("/posts/{id}")//게시글 수정 메서드
+    @PutMapping("/posts/{id}") // 게시글 수정 메서드
     public ResponseEntity<String> updatePost(@PathVariable("id") Long postId,
                                              HttpSession session,
                                              @RequestParam("title") String title,
@@ -228,7 +225,7 @@ public class PostController {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
-            //작성자와 현재 로그인한 회원이 일치해야만 수정 가능
+            // 작성자와 현재 로그인한 회원이 일치해야만 수정 가능
             if (post.getAuthor().getId().equals(loggedInMember.getId())) {
                 if (title != null) {
                     post.setTitle(title);
@@ -237,16 +234,13 @@ public class PostController {
                     post.setContent(content);
                 }
 
-                // 기존 이미지 삭제
-                List<String> existingImageUrls = post.getImageUrls();
-                postService.deleteImages(existingImageUrls);
-
-                // 새로운 이미지 저장
+                // 새로운 이미지가 있는 경우 기존 이미지 삭제 후 새로운 이미지 저장
                 if (images != null && !images.isEmpty()) {
-                    List<String> newImageUrls = postService.saveImages(images);
+                    List<String> existingImageUrls = post.getImageUrls();
+                    postService.deleteImages(existingImageUrls); // 기존 이미지들 삭제
+
+                    List<String> newImageUrls = postService.saveImages(images); // 새로운 이미지 저장
                     post.setImageUrls(newImageUrls);
-                } else {
-                    post.setImageUrls(Collections.emptyList());
                 }
 
                 postRepository.save(post);
@@ -257,9 +251,10 @@ public class PostController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 ID의 게시물을 찾을 수 없습니다.");
         }
-
     }
-        @PostMapping("/posts/{postId}/like")//게시글 좋아요 표기 메서드
+
+
+    @PostMapping("/posts/{postId}/like")//게시글 좋아요 표기 메서드
     public ResponseEntity<String> likePost(@PathVariable("postId") Long postId, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {

@@ -21,7 +21,8 @@ public class Brand {
     @JsonIgnore
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Post> posts;
-    @OneToMany(mappedBy = "brand")
+    @JsonIgnore
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
     public List<Allow> getAllows() {

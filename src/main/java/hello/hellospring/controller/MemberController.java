@@ -1,7 +1,9 @@
 package hello.hellospring.controller;
+import hello.hellospring.domain.AllowVerifiedMember;
 import hello.hellospring.domain.EmploymentType;
 import hello.hellospring.domain.Member;
 import hello.hellospring.domain.Post;
+import hello.hellospring.repository.AllowVerifiedMemberRepository;
 import hello.hellospring.service.MemberService;
 import hello.hellospring.service.PostService;
 import jakarta.servlet.http.HttpSession;
@@ -16,17 +18,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class MemberController {
 
     private final MemberService memberService;
     private final PostService postService;
+    private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
 
     @Autowired
-    public MemberController(MemberService memberService,PostService postService) {
+    public MemberController(MemberService memberService,PostService postService,AllowVerifiedMemberRepository allowVerifiedMemberRepository) {
         this.memberService = memberService;
         this.postService=postService;
+        this.allowVerifiedMemberRepository=allowVerifiedMemberRepository;
     }
 
     @GetMapping("/members/new")
@@ -117,7 +122,7 @@ public class MemberController {
         return ResponseEntity.ok("로그아웃이 성공적으로 완료되었습니다.");
     }
 
-    @GetMapping("/profile")//프로필 정보 반환 메서드
+    @GetMapping("/profile") // 프로필 정보 반환 메서드
     public ResponseEntity<Map<String, Object>> showProfile(HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
         if (loggedInMember == null) {
@@ -125,13 +130,20 @@ public class MemberController {
         }
 
         List<Post> userPosts = postService.findPostsByAuthorId(loggedInMember.getId());
+        List<AllowVerifiedMember> verifiedMembers = allowVerifiedMemberRepository.findByMemberId(loggedInMember.getId());
+
+        List<String> brandNames = verifiedMembers.stream()
+                .map(vm -> vm.getBrand().getName())
+                .collect(Collectors.toList());
 
         Map<String, Object> response = new HashMap<>();
         response.put("member", loggedInMember);
         response.put("posts", userPosts);
+        response.put("brands", brandNames);
 
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/profile/updateNickname")//회원 닉네임 수정 메서드
     public ResponseEntity<String> updateNickname(@RequestBody Map<String, String> request, HttpSession session) {

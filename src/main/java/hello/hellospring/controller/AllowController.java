@@ -85,7 +85,6 @@ public class AllowController {
     @PostMapping("/{brandName}/{id}/approve")//근로계약서 인증 허가 메서드
     public ResponseEntity<?> approveAllow(@PathVariable("brandName") String brandName, @PathVariable("id") Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-
         if (loggedInMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
@@ -93,42 +92,29 @@ public class AllowController {
         Brand brand = brandService.findBrandByName(brandName)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid brand name: " + brandName));
 
-        System.out.println("Brand ID: " + brand.getId()); // 로그 출력
+        System.out.println("Brand ID: " + brand.getId());
+        System.out.println("Brand Name: " + brand.getName());
 
         try {
-            Allow allow = allowService.findAllowById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid allow ID"));
-
-            // AllowVerifiedMember 객체 생성 및 저장
-            AllowVerifiedMember verifiedMember = new AllowVerifiedMember();
-            verifiedMember.setMember(allow.getMember()); // 글 작성자
-            verifiedMember.setBrand(brand); // 해당 브랜드
-
-            System.out.println("AllowVerifiedMember Brand ID: " + verifiedMember.getBrand().getId()); // 로그 출력
-
-            allowVerifiedMemberRepository.save(verifiedMember);
-
-            // 확인을 위해 저장된 객체 출력
-            AllowVerifiedMember savedVerifiedMember = allowVerifiedMemberRepository.findById(verifiedMember.getId()).orElse(null);
-            if (savedVerifiedMember != null) {
-                System.out.println("Saved AllowVerifiedMember Brand ID: " + savedVerifiedMember.getBrand().getId());
-            } else {
-                System.out.println("AllowVerifiedMember 저장 실패");
-            }
-
+            allowService.approveAllow(id, brand);
             return ResponseEntity.ok("인증이 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
-    @PostMapping("/reject")//근로계약서 인증 거부 메서드
-    public ResponseEntity<?> rejectAllow(@RequestBody Map<String, Long> request, HttpSession session) {
+    @PostMapping("/{brandName}/{id}/reject")//근로계약서 인증 거부 메서드
+    public ResponseEntity<?> rejectAllow(@PathVariable("brandName") String brandName, @PathVariable("id") Long id, HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        Long allowId = request.get("allowId");
+        if (loggedInMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
 
-        allowService.rejectAllow(allowId);
-        return ResponseEntity.ok("근로계약서 인증 요청이 거부되었습니다.");
+        try {
+            allowService.rejectAllow(id);
+            return ResponseEntity.ok("근로계약서 인증 요청이 거부되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
     @GetMapping // 근로계약서 인증 글 목록 확인 메서드
     public ResponseEntity<?> getAllAllows(HttpSession session) {

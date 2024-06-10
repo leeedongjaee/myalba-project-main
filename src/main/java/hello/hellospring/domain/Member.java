@@ -1,5 +1,6 @@
 package hello.hellospring.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.Base64;
@@ -23,6 +24,19 @@ public class Member {
     public List<Allow> getAllows() {
         return allows;
     }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    private List<Review> reviews;
+
 
     public void setAllows(List<Allow> allows) {
         this.allows = allows;

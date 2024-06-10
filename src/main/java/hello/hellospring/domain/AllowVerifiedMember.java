@@ -37,7 +37,7 @@ public class AllowVerifiedMember {
         return brand;
     }
 
-    public void setBrand(Brand brandId) {
+    public void setBrand(Brand brand) {
         this.brand = brand;
     }
 }

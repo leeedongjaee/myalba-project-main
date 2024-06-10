@@ -65,7 +65,19 @@ public class AllowService {
         allowRepository.deleteById(id);
     }//인증 글 삭제 서비스
 
+    @Transactional
+    public void approveAllow(Long allowId, Brand brand) {
+        Allow allow = allowRepository.findById(allowId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid allow ID"));
 
+        AllowVerifiedMember verifiedMember = new AllowVerifiedMember();
+        verifiedMember.setMember(allow.getMember());
+        verifiedMember.setBrand(brand);
+
+        allowVerifiedMemberRepository.save(verifiedMember);
+        allowRepository.deleteById(allowId);
+
+    }
 
     public void rejectAllow(Long allowId) {
         allowRepository.deleteById(allowId);
