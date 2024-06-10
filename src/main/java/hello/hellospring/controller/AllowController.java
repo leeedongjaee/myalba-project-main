@@ -34,7 +34,7 @@ public class AllowController {
     @PostMapping("/new")//근로계약서 인증 글 저장 메서드
     public ResponseEntity<String> createAllow(@RequestParam("title") String title,
                                               @RequestParam("content") String content,
-                                              @RequestParam("brandId") Long brandId,
+                                              @RequestParam("brandName") String brandName,
                                               @RequestParam(value = "images", required = false) List<MultipartFile> images,
                                               HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
@@ -42,9 +42,9 @@ public class AllowController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        Optional<Brand> brandOptional = brandService.findById(brandId);
+        Optional<Brand> brandOptional = brandService.findBrandByName(brandName);
         if (!brandOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 브랜드 ID입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 브랜드 이름입니다.");
         }
 
         Allow allow = new Allow();
