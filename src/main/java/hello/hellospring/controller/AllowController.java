@@ -65,9 +65,6 @@ public class AllowController {
     @GetMapping//근로계약서 인증 글 목록 확인 메서드
     public ResponseEntity<?> getAllAllows(HttpSession session) {
         Member loggedInMember = (Member) session.getAttribute("loggedInMember");
-        if (loggedInMember == null || !loggedInMember.getEmploymentType().equals("MASTER")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("관리자 권한이 필요합니다.");
-        }
         List<Allow> allows = allowService.getAllAllows();
         return ResponseEntity.ok(allows);
     }
