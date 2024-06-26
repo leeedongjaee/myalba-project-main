@@ -66,4 +66,5 @@ public class HirePostController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
+
 }
