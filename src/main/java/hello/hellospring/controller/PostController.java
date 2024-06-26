@@ -274,4 +274,5 @@ public class PostController {
         List<Post> posts = postService.findPostsByEmploymentTypeOrderByLikesDesc(EmploymentType.BOSS);
         return ResponseEntity.ok(posts);
     }
+
 }
