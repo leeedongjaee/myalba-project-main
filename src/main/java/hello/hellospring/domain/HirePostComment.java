@@ -64,4 +64,5 @@ public class HirePostComment {
         this.createdAt = createdAt;
     }
 
+
 }
