@@ -26,4 +26,5 @@ public class HomeController {
         List<Brand> brands = brandService.getAllBrands();
         return ResponseEntity.ok(brands);
     }
+
 }
