@@ -100,4 +100,5 @@ public class CommentController {
         List<Comment> replies = commentService.getReplies(parentId);
         return ResponseEntity.ok(replies);
     }
+
 }
