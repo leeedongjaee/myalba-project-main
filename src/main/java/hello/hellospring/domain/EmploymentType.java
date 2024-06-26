@@ -4,4 +4,5 @@ public enum EmploymentType {
     EMPLOYEE,
     BOSS,
     MASTER,
+
 }
