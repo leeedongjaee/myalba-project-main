@@ -26,7 +26,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class AllowService {
-
     private final AllowRepository allowRepository;
     private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
     private final MemberRepository memberRepository;
