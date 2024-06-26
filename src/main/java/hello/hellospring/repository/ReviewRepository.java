@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByBrandId(Long brandId);//브랜드 ID를 통해 찾는 메서드
+
 }
