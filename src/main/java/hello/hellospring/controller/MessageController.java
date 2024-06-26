@@ -68,4 +68,5 @@ public class MessageController {
         List<Map<String, Object>> conversations = messageService.getAllConversations(loggedInMember.getId());
         return ResponseEntity.ok(conversations);
     }
+
 }
