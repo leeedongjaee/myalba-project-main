@@ -32,7 +32,7 @@ public class HirePostController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("자영업자만 게시글을 작성할 수 있습니다.");
         }
 
-        hirePostService.createPost(form.getTitle(), form.getContent(), form.getSalary(), loggedInMember);
+        hirePostService.createPost(form.getTitle(), form.getContent(), form.getHourlyWage(), loggedInMember);
         return ResponseEntity.status(HttpStatus.CREATED).body("채용 게시글이 성공적으로 작성되었습니다.");
     }
     @GetMapping("/{id}")//채용공고 게시글 상세보기 메서드
