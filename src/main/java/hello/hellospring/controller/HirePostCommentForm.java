@@ -11,4 +11,5 @@ public class HirePostCommentForm {
     public void setContent(String content) {
         this.content = content;
     }
+
 }
