@@ -51,4 +51,5 @@ public class ReviewController {
         List<Review> reviews = reviewService.findReviewsByBrandId(brandId);
         return ResponseEntity.ok(reviews);
     }
+
 }
