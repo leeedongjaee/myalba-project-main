@@ -8,5 +8,4 @@ import java.util.List;
 public interface AllowVerifiedMemberRepository extends JpaRepository<AllowVerifiedMember, Long> {
     boolean existsByMemberIdAndBrandId(Long memberId, Long brandId);
     List<AllowVerifiedMember> findByMemberId(Long memberId);
-
 }
