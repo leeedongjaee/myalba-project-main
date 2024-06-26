@@ -39,4 +39,5 @@ public class AllowForm {
     public void setBrandId(Long brandId) {
         this.brandId = brandId;
     }
+
 }
