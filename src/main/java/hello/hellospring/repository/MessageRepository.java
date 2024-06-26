@@ -18,4 +18,5 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByReceiverId(Long receiverId);//메시지 받는 회원 ID를 통해 찾는 메서드
 
     List<Message> findAllByReceiverIdAndIsReadFalse(Long receiverId);//메시지의 읽음 유무를 찾는 메서드
+
 }
