@@ -62,5 +62,4 @@ public class MemberForm {
                 name != null && !name.trim().isEmpty() &&
                 nickname != null && !nickname.trim().isEmpty();
     }
-
 }
