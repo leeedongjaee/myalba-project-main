@@ -19,4 +19,5 @@ public class CommentForm {
     public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
+
 }
