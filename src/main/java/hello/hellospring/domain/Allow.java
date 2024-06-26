@@ -97,4 +97,5 @@ public class Allow {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
 }
