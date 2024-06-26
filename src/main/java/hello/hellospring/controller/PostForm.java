@@ -72,5 +72,6 @@ public class PostForm {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
 }
 
