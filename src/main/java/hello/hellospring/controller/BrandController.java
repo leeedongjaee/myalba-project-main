@@ -63,6 +63,7 @@ public class BrandController {
             this.averageRating = averageRating;
         }
     }
+
 }
 
 
