@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
     @Autowired
     public LikeService(PostRepository postRepository, MemberRepository memberRepository) {
         this.postRepository = postRepository;
