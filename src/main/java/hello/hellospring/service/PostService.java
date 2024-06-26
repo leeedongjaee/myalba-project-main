@@ -24,7 +24,6 @@ import java.util.Optional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
     //이미지 파일 경로 지정
     @Value("${file.upload-dir}")
     private String uploadDir;
