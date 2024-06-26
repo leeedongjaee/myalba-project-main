@@ -14,7 +14,6 @@ import java.util.List;
 
 @Service
 public class HirePostCommentService {
-
     private final HirePostCommentRepository commentRepository;
     private final HirePostRepository postRepository;
 
