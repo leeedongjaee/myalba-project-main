@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Service
 public class HirePostService {
-
     private final HirePostRepository hirePostRepository;
 
     @Autowired
