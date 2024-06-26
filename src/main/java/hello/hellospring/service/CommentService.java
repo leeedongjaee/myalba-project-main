@@ -15,7 +15,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class CommentService {
-
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final MemberService memberService;
