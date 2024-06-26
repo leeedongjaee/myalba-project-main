@@ -29,4 +29,5 @@ public class HirePostForm {
     public void setHourlyWage(double hourlyWage) {
         this.hourlyWage = hourlyWage;
     }
+
 }
