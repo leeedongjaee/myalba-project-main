@@ -52,7 +52,6 @@ public class JpaMemberRepository implements MemberRepository {
         return result.stream().findAny();
     }
 
-
     @Override
     public Optional<Member> findByNickname(String nickname) {
         List<Member> result = em.createQuery("select m from Member m where m.nickname = :nickname", Member.class)
