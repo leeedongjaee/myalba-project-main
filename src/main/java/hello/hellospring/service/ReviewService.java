@@ -22,7 +22,6 @@ public class ReviewService {
     private final BrandRepository brandRepository;
     private final MemberRepository memberRepository;
     private final AllowVerifiedMemberRepository allowVerifiedMemberRepository;
-
     public ReviewService(ReviewRepository reviewRepository, BrandRepository brandRepository, MemberRepository memberRepository, AllowVerifiedMemberRepository allowVerifiedMemberRepository) {
         this.reviewRepository = reviewRepository;
         this.brandRepository = brandRepository;
