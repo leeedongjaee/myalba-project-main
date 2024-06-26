@@ -91,4 +91,5 @@ public class HirePost {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
 }
