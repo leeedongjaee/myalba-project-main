@@ -14,7 +14,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Post save(Post post);
 
     List<Post> findByBrandId(Long id);//브랜드 ID를 통해 찾는 메서드
-
     List<Post> findByBrandName(String brandName);//브랜드 이름을 통해 찾는 메서드
     List<Post> findByBrandNameAndEmploymentType(String brandName, EmploymentType employmentType);//브랜드 이름과 회원 유형을 통해 찾는 메서드
     List<Post> findByAuthorId(Long authorId);//작성자 ID를 통해 찾는 메서드
