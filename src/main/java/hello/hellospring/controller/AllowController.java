@@ -122,5 +122,6 @@ public class AllowController {
         List<Allow> allows = allowService.getAllAllows();
         return ResponseEntity.ok(allows);
     }
+
 }
 
