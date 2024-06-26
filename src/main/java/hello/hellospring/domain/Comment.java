@@ -101,4 +101,5 @@ public class Comment {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
 }
